@@ -73,6 +73,7 @@ model Question {
   testId    Int
   quizId    Int
   answered  Boolean  @default(false)
+  options   String[]
   test      Test     @relation(fields: [testId], references: [id])
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   createdAt DateTime @default(now())
@@ -87,6 +88,6 @@ enum Role {
 }
 
 enum QuesType {
-  mulitple
+  multiple
   single
 }

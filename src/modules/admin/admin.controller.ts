@@ -31,7 +31,7 @@ const addCategory = catchAsync(async (req: Request, res: Response) => {
 
 const addQuiz = catchAsync(async (req: Request, res: Response) => {
   const { error } = quizSchema.validate(req.body);
-  const categoryId = req.params.id;
+  const categoryId = Number(req.params.id);
   const adminId = req.user?.id;
   if (error) {
     sendResponse(res, {
@@ -49,7 +49,7 @@ const addQuiz = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
-      message: 'Category added successfully',
+      message: 'Quiz added successfully',
       data: result,
     });
   }

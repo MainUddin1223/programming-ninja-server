@@ -5,6 +5,6 @@ import { adminController } from './admin.controller';
 const router = express.Router();
 
 router.route('/add-category').post(verifyAdmin, adminController.addCategory);
-router.route('/add-quiz').post(verifyAdmin, adminController.addQuiz);
+router.route('/add-quiz/:id').post(verifyAdmin, adminController.addQuiz);
 
 export default { adminRouter: router };
