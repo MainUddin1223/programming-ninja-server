@@ -9,10 +9,6 @@ const defaultRoutes = [
     path: '/auth',
     route: authRouter.authRouter,
   },
-  {
-    path: '/auth',
-    route: authRouter.authRouter,
-  },
 ];
 defaultRoutes.forEach(route => {
   const apis = route.route.stack.map((path: any) => {
