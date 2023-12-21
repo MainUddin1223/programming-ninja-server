@@ -62,6 +62,7 @@ model Test {
   wrongAnswer Int        @default(0)
   rightAnswer Int        @default(0)
   categoryId  Int
+  isCompleted Boolean    @default(false)
   category    Category   @relation(fields: [categoryId], references: [id])
   user        Auth       @relation(fields: [userId], references: [id])
   question    Question[]

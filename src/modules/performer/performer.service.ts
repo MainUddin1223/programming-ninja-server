@@ -1,5 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import { ICreateTest, ITestQuestions } from './performer.interface';
+import {
+  ICreateTest,
+  ICurrentStatics,
+  IStaticsAcc,
+  ITestQuestions,
+} from './performer.interface';
 import ApiError from '../../utils/errorHandlers/apiError';
 import { StatusCodes } from 'http-status-codes';
 import { getRandomValues } from './performer.utils';
@@ -65,6 +70,77 @@ const createQuizTest = async (payload: ICreateTest) => {
   return getQuizTestQuestions;
 };
 
+const getMyQuizTests = async (id: number) => {
+  const result = await prisma.test.findMany({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
+const getStatics = async (id: number) => {
+  const myStatics: any = await prisma.$queryRaw`
+    SELECT pro.name, pro.email, ts.score, ts."wrongAnswer", ts."rightAnswer", ct.category
+    FROM auth as pro
+    LEFT JOIN test as ts ON pro.id = ts."userId"
+    RIGHT JOIN category as ct ON ts."categoryId" = ct.id
+    WHERE pro.id = ${id}
+    `;
+  const statics = myStatics.reduce(
+    (acc: IStaticsAcc, current: ICurrentStatics) => {
+      const { name, email, score, wrongAnswer, rightAnswer, category } =
+        current;
+      if (!acc['category'].includes(category)) {
+        acc['category'].push(category);
+      }
+      acc['totalScore'] += Number(score);
+      acc['name'] = name;
+      acc['email'] = email;
+      acc['totalRightAnswer'] += Number(rightAnswer);
+      acc['totalWrongAnswer'] += Number(wrongAnswer);
+      acc['totalTest'] += 1;
+      return acc;
+    },
+    {
+      totalScore: 0,
+      totalRightAnswer: 0,
+      totalWrongAnswer: 0,
+      name: '',
+      email: '',
+      category: [],
+      totalTest: 0,
+    }
+  );
+
+  const myQuizTests = await prisma.test.findMany({
+    where: {
+      userId: id,
+    },
+    select: {
+      score: true,
+      wrongAnswer: true,
+      rightAnswer: true,
+      category: {
+        select: {
+          category: true,
+        },
+      },
+      question: {
+        select: {
+          quizId: true,
+          options: true,
+          answered: true,
+        },
+      },
+    },
+  });
+
+  return { statics, myQuizTests };
+};
+
 export const performerService = {
   createQuizTest,
+  getMyQuizTests,
+  getStatics,
 };

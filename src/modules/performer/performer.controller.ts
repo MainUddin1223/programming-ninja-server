@@ -17,6 +17,16 @@ const createQuizTest = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getStatics = catchAsync(async (req: Request, res: Response) => {
+  const result = await performerService.getStatics(req.user?.id);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Category added successfully',
+    data: result,
+  });
+});
 export const performerController = {
   createQuizTest,
+  getStatics,
 };
