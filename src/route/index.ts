@@ -2,12 +2,17 @@
 import express from 'express';
 import config from '../utils/config';
 import authRouter from '../modules/auth/auth.route';
+import adminRouter from '../modules/admin/admin.route';
 const router = express.Router();
 
 const defaultRoutes = [
   {
     path: '/auth',
     route: authRouter.authRouter,
+  },
+  {
+    path: '/admin',
+    route: adminRouter.adminRouter,
   },
 ];
 defaultRoutes.forEach(route => {

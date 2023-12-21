@@ -8,6 +8,7 @@ const prisma = new PrismaClient();
 const verifyAuthWithRole = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
+
     if (!token) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -18,7 +19,7 @@ const verifyAuthWithRole = (allowedRoles: string[]) => {
         config.jwt_access_secret as string
       );
 
-      if (!decoded.authId) {
+      if (!decoded.id) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
       const isExist = await prisma.auth.findUnique({
@@ -31,7 +32,7 @@ const verifyAuthWithRole = (allowedRoles: string[]) => {
         return res.status(401).json({ message: 'Unauthorized' });
       }
       req.user = {
-        authId: isExist.id,
+        id: isExist.id,
         role: isExist.role,
       };
       next();
@@ -52,7 +53,7 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
       token,
       config.jwt_access_secret as string
     );
-    if (!decoded.authId) {
+    if (!decoded.id) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     const isExist = await prisma.auth.findUnique({
@@ -65,7 +66,7 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     req.user = {
-      authId: isExist.id,
+      id: isExist.id,
       role: isExist.role,
     };
     next();
@@ -74,7 +75,7 @@ const verifyAuth = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const verifyAdmin = verifyAuthWithRole(['admin', 'performer']);
+const verifyAdmin = verifyAuthWithRole(['admin']);
 const verifyPerformer = verifyAuthWithRole(['performer']);
 
 export { verifyAdmin, verifyPerformer, verifyAuth };
