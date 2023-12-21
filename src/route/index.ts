@@ -3,6 +3,7 @@ import express from 'express';
 import config from '../utils/config';
 import authRouter from '../modules/auth/auth.route';
 import adminRouter from '../modules/admin/admin.route';
+import performerRouter from '../modules/performer/performer.route';
 const router = express.Router();
 
 const defaultRoutes = [
@@ -13,6 +14,10 @@ const defaultRoutes = [
   {
     path: '/admin',
     route: adminRouter.adminRouter,
+  },
+  {
+    path: '/performer',
+    route: performerRouter.performerRouter,
   },
 ];
 defaultRoutes.forEach(route => {

@@ -33,6 +33,7 @@ model Category {
   quiz      Quiz[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Test      Test[]
 
   @@map("category")
 }
@@ -57,11 +58,13 @@ model Quiz {
 model Test {
   id          Int        @id @default(autoincrement())
   userId      Int
-  Score       Int        @default(0)
+  score       Int        @default(0)
   wrongAnswer Int        @default(0)
   rightAnswer Int        @default(0)
+  categoryId  Int
+  category    Category   @relation(fields: [categoryId], references: [id])
   user        Auth       @relation(fields: [userId], references: [id])
-  Question    Question[]
+  question    Question[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -69,15 +72,16 @@ model Test {
 }
 
 model Question {
-  id        Int      @id @default(autoincrement())
-  testId    Int
-  quizId    Int
-  answered  Boolean  @default(false)
-  options   String[]
-  test      Test     @relation(fields: [testId], references: [id])
-  quiz      Quiz     @relation(fields: [quizId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  testId       Int
+  quizId       Int
+  answered     Boolean  @default(false)
+  options      String[]
+  questionType QuesType
+  test         Test     @relation(fields: [testId], references: [id])
+  quiz         Quiz     @relation(fields: [quizId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("question")
 }
