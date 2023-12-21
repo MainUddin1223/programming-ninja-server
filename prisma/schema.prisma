@@ -9,3 +9,84 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Auth {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  name      String
+  role      Role       @default(performer)
+  category  Category[]
+  quiz      Quiz[]
+  test      Test[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("auth")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  category  String
+  admin     Auth     @relation(fields: [adminId], references: [id])
+  quiz      Quiz[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("category")
+}
+
+model Quiz {
+  id           Int        @id @default(autoincrement())
+  adminId      Int
+  categoryId   Int
+  answer       String[]
+  options      String[]
+  question     String
+  questionType QuesType
+  category     Category   @relation(fields: [categoryId], references: [id])
+  admin        Auth       @relation(fields: [adminId], references: [id])
+  ques         Question[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("quiz")
+}
+
+model Test {
+  id          Int        @id @default(autoincrement())
+  userId      Int
+  Score       Int        @default(0)
+  wrongAnswer Int        @default(0)
+  rightAnswer Int        @default(0)
+  user        Auth       @relation(fields: [userId], references: [id])
+  Question    Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("test")
+}
+
+model Question {
+  id        Int      @id @default(autoincrement())
+  testId    Int
+  quizId    Int
+  answered  Boolean  @default(false)
+  test      Test     @relation(fields: [testId], references: [id])
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("question")
+}
+
+enum Role {
+  admin
+  performer
+}
+
+enum QuesType {
+  mulitple
+  single
+}
