@@ -1,4 +1,4 @@
-import { ISignUpPayload } from './auth.interface';
+import { ILoginPayload, ISignUpPayload } from './auth.interface';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import ApiError from '../../utils/errorHandlers/apiError';
@@ -47,6 +47,47 @@ const signUp = async (payload: ISignUpPayload) => {
   };
 };
 
+const login = async (payload: ILoginPayload) => {
+  const { email, password } = payload;
+  const isUserExist = await prisma.auth.findFirst({
+    where: {
+      email,
+    },
+  });
+  if (!isUserExist) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Something went wrong'
+    );
+  }
+
+  const isPasswordMatched = await bcrypt.compare(
+    password,
+    isUserExist.password
+  );
+  if (!isPasswordMatched) {
+    throw new ApiError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Something went wrong'
+    );
+  }
+  const accessData = {
+    role: isUserExist.role,
+    id: isUserExist.id,
+  };
+  const accessToken = await jwtToken.createToken(
+    accessData,
+    config.jwt_access_secret as string,
+    config.expires_in as string
+  );
+  return {
+    accessToken,
+    name: isUserExist.name,
+    email: isUserExist.email,
+  };
+};
+
 export const authService = {
   signUp,
+  login,
 };
