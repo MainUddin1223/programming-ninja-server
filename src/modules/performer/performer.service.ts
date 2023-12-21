@@ -113,7 +113,7 @@ const getStatics = async (id: number) => {
     }
   );
 
-  const myQuizTests = await prisma.test.findMany({
+  const result = await prisma.test.findMany({
     where: {
       userId: id,
     },
@@ -121,6 +121,7 @@ const getStatics = async (id: number) => {
       score: true,
       wrongAnswer: true,
       rightAnswer: true,
+      isCompleted: true,
       category: {
         select: {
           category: true,
@@ -131,12 +132,23 @@ const getStatics = async (id: number) => {
           quizId: true,
           options: true,
           answered: true,
+          quiz: {
+            select: {
+              answer: true,
+            },
+          },
         },
       },
     },
   });
-
-  return { statics, myQuizTests };
+  result.forEach(test => {
+    test.question.forEach(ques => {
+      if (ques.answered == false) {
+        ques.quiz = { answer: [] };
+      }
+    });
+  });
+  return { statics, result };
 };
 
 export const performerService = {

@@ -27,3 +27,20 @@ export interface IStaticsAcc {
   category: string[];
   totalTest: number;
 }
+export interface IMyTests {
+  score: number;
+  wrongAnswer: number;
+  rightAnswer: number;
+  category: {
+    category: string;
+  };
+  isCompleted: boolean;
+  question: {
+    quiz?: {
+      answer: string[];
+    };
+    quizId: number;
+    answered: boolean;
+    options: string[];
+  };
+}
