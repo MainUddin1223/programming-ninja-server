@@ -10,5 +10,8 @@ router
 router
   .route('/my-statics')
   .get(verifyPerformer, performerController.getStatics);
+router
+  .route('/verify-answer/:id')
+  .patch(verifyPerformer, performerController.verifyAnswer);
 
 export default { performerRouter: router };

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import {
+  ICheckAnswer,
   ICreateTest,
   ICurrentStatics,
   IStaticsAcc,
@@ -7,7 +8,7 @@ import {
 } from './performer.interface';
 import ApiError from '../../utils/errorHandlers/apiError';
 import { StatusCodes } from 'http-status-codes';
-import { getRandomValues } from './performer.utils';
+import { getAnswerVerified, getRandomValues } from './performer.utils';
 const prisma = new PrismaClient();
 
 const createQuizTest = async (payload: ICreateTest) => {
@@ -37,6 +38,7 @@ const createQuizTest = async (payload: ICreateTest) => {
       const options = getRandomValues(optionsWithAnswers, 4);
       testQuestions.push({
         quizId: question.id,
+        userId: payload.userId,
         options,
         testId: quizTest.id,
         questionType: question.questionType,
@@ -68,6 +70,37 @@ const createQuizTest = async (payload: ICreateTest) => {
     },
   });
   return getQuizTestQuestions;
+};
+
+const checkAnswer = async (payload: ICheckAnswer) => {
+  const { selectedAnswer } = payload;
+  const isQuesExist = await prisma.question.findFirst({
+    where: {
+      id: payload.questionId,
+      userId: payload.userId,
+    },
+    include: {
+      quiz: true,
+    },
+  });
+  if (!isQuesExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Question not found');
+  }
+  if (isQuesExist.answered === true) {
+    throw new ApiError(
+      StatusCodes.UNAUTHORIZED,
+      'You have already answered the question'
+    );
+  }
+  const verifyAnswer = getAnswerVerified(
+    isQuesExist.questionType,
+    isQuesExist.options,
+    isQuesExist.quiz.answer,
+    selectedAnswer,
+    isQuesExist.id,
+    isQuesExist.testId
+  );
+  return verifyAnswer;
 };
 
 const getMyQuizTests = async (id: number) => {
@@ -155,4 +188,5 @@ export const performerService = {
   createQuizTest,
   getMyQuizTests,
   getStatics,
+  checkAnswer,
 };

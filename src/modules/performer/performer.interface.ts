@@ -6,6 +6,7 @@ export interface ICreateTest {
 }
 export interface ITestQuestions {
   quizId: number;
+  userId: number;
   options: string[];
   testId: number;
   questionType: QuesType;
@@ -43,4 +44,10 @@ export interface IMyTests {
     answered: boolean;
     options: string[];
   };
+}
+
+export interface ICheckAnswer {
+  questionId: number;
+  userId: number;
+  selectedAnswer: string[];
 }

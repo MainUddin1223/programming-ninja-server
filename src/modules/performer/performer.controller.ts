@@ -22,11 +22,29 @@ const getStatics = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'Category added successfully',
+    message: 'Data retrieved successfully',
+    data: result,
+  });
+});
+
+const verifyAnswer = catchAsync(async (req: Request, res: Response) => {
+  const questionId = Number(req.params.id);
+  const selectedAnswer = req.body.answer;
+  const userId = Number(req.user?.id);
+  const result = await performerService.checkAnswer({
+    userId,
+    questionId,
+    selectedAnswer,
+  });
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Answer verified successfully',
     data: result,
   });
 });
 export const performerController = {
   createQuizTest,
   getStatics,
+  verifyAnswer,
 };

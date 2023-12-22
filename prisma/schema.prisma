@@ -21,6 +21,7 @@ model Auth {
   test      Test[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  question  Question[]
 
   @@map("auth")
 }
@@ -73,16 +74,21 @@ model Test {
 }
 
 model Question {
-  id           Int      @id @default(autoincrement())
-  testId       Int
-  quizId       Int
-  answered     Boolean  @default(false)
-  options      String[]
-  questionType QuesType
-  test         Test     @relation(fields: [testId], references: [id])
-  quiz         Quiz     @relation(fields: [quizId], references: [id])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  testId          Int
+  quizId          Int
+  userId          Int
+  selectedAnswer  String[]
+  correctAnswer   String[]
+  answered        Boolean  @default(false)
+  isCorrectAnswer Boolean  @default(false)
+  options         String[]
+  questionType    QuesType
+  user            Auth     @relation(fields: [userId], references: [id])
+  test            Test     @relation(fields: [testId], references: [id])
+  quiz            Quiz     @relation(fields: [quizId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("question")
 }
