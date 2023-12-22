@@ -165,21 +165,13 @@ const getStatics = async (id: number) => {
           quizId: true,
           options: true,
           answered: true,
-          quiz: {
-            select: {
-              answer: true,
-            },
-          },
+          correctAnswer: true,
+          isCorrectAnswer: true,
+          questionType: true,
+          selectedAnswer: true,
         },
       },
     },
-  });
-  result.forEach(test => {
-    test.question.forEach(ques => {
-      if (ques.answered == false) {
-        ques.quiz = { answer: [] };
-      }
-    });
   });
   return { statics, result };
 };
