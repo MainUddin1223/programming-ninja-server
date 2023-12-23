@@ -79,6 +79,33 @@ const getCategories = async () => {
       category: true,
     },
   });
+  return { result };
+};
+
+const getMyTestById = async (id: number, userId: number) => {
+  const result = await prisma.test.findUnique({
+    where: {
+      id,
+      userId,
+    },
+    // select: {
+    //   id: true,
+    //   category: {
+    //     select: {
+    //       category: true
+    //     }
+    //   },
+
+    // },
+    include: {
+      category: {
+        select: {
+          category: true,
+        },
+      },
+      question: true,
+    },
+  });
   return result;
 };
 
@@ -116,7 +143,7 @@ const checkAnswer = async (payload: ICheckAnswer) => {
 const getMyQuizTests = async (id: number) => {
   const result = await prisma.test.findMany({
     where: {
-      id,
+      userId: id,
     },
   });
   return result;
@@ -192,4 +219,5 @@ export const performerService = {
   getStatics,
   checkAnswer,
   getCategories,
+  getMyTestById,
 };

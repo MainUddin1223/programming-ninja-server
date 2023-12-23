@@ -53,9 +53,32 @@ const getCategories = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMyTests = catchAsync(async (req: Request, res: Response) => {
+  const userId = Number(req?.user?.id);
+  const result = await performerService.getMyQuizTests(userId);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'My tests retrieved successfully',
+    data: result,
+  });
+});
+const getMyTestById = catchAsync(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const userId = Number(req?.user?.id);
+  const result = await performerService.getMyTestById(id, userId);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Test retrieved successfully',
+    data: result,
+  });
+});
 export const performerController = {
   createQuizTest,
   getStatics,
   verifyAnswer,
   getCategories,
+  getMyTestById,
+  getMyTests,
 };

@@ -5,6 +5,10 @@ import { performerController } from './performer.controller';
 const router = express.Router();
 
 router.route('/categories').get(performerController.getCategories);
+router.route('/my-tests').get(verifyPerformer, performerController.getMyTests);
+router
+  .route('/my-tests/:id')
+  .get(verifyPerformer, performerController.getMyTestById);
 
 router
   .route('/request-test/:id')
