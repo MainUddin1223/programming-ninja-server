@@ -72,6 +72,16 @@ const createQuizTest = async (payload: ICreateTest) => {
   return getQuizTestQuestions;
 };
 
+const getCategories = async () => {
+  const result = await prisma.category.findMany({
+    select: {
+      id: true,
+      category: true,
+    },
+  });
+  return result;
+};
+
 const checkAnswer = async (payload: ICheckAnswer) => {
   const { selectedAnswer } = payload;
   const isQuesExist = await prisma.question.findFirst({
@@ -181,4 +191,5 @@ export const performerService = {
   getMyQuizTests,
   getStatics,
   checkAnswer,
+  getCategories,
 };

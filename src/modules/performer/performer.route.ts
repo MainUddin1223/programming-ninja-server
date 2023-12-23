@@ -4,6 +4,8 @@ import { performerController } from './performer.controller';
 
 const router = express.Router();
 
+router.route('/categories').get(performerController.getCategories);
+
 router
   .route('/request-test/:id')
   .post(verifyPerformer, performerController.createQuizTest);

@@ -43,8 +43,19 @@ const verifyAnswer = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const getCategories = catchAsync(async (req: Request, res: Response) => {
+  const result = await performerService.getCategories();
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Category retrieved successfully',
+    data: result,
+  });
+});
 export const performerController = {
   createQuizTest,
   getStatics,
   verifyAnswer,
+  getCategories,
 };
