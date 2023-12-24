@@ -167,7 +167,7 @@ const getMyQuizTests = async (id: number) => {
 
 const getStatics = async (id: number) => {
   const myStatics: any = await prisma.$queryRaw`
-    SELECT pro.name, pro.email, ts.score, ts."wrongAnswer", ts."rightAnswer", ct.category
+    SELECT pro.name, pro.email,ts."isCompleted", ts.score, ts."wrongAnswer", ts."rightAnswer", ct.category
     FROM auth as pro
     LEFT JOIN test as ts ON pro.id = ts."userId"
     RIGHT JOIN category as ct ON ts."categoryId" = ct.id
@@ -175,8 +175,15 @@ const getStatics = async (id: number) => {
     `;
   const statics = myStatics.reduce(
     (acc: IStaticsAcc, current: ICurrentStatics) => {
-      const { name, email, score, wrongAnswer, rightAnswer, category } =
-        current;
+      const {
+        name,
+        email,
+        score,
+        wrongAnswer,
+        rightAnswer,
+        category,
+        isCompleted,
+      } = current;
       if (!acc['category'].includes(category)) {
         acc['category'].push(category);
       }
@@ -186,47 +193,35 @@ const getStatics = async (id: number) => {
       acc['totalRightAnswer'] += Number(rightAnswer);
       acc['totalWrongAnswer'] += Number(wrongAnswer);
       acc['totalTest'] += 1;
+      if (isCompleted) {
+        acc['totalCompletedTest'] += 1;
+      } else {
+        acc['totalPendingTest'] += 1;
+      }
       return acc;
     },
     {
       totalScore: 0,
       totalRightAnswer: 0,
       totalWrongAnswer: 0,
+      completedTest: 0,
+      pendingTest: 0,
       name: '',
       email: '',
       category: [],
       totalTest: 0,
+      totalCompletedTest: 0,
+      totalPendingTest: 0,
     }
   );
-
-  const result = await prisma.test.findMany({
-    where: {
-      userId: id,
-    },
-    select: {
-      score: true,
-      wrongAnswer: true,
-      rightAnswer: true,
-      isCompleted: true,
-      category: {
-        select: {
-          category: true,
-        },
-      },
-      question: {
-        select: {
-          quizId: true,
-          options: true,
-          answered: true,
-          correctAnswer: true,
-          isCorrectAnswer: true,
-          questionType: true,
-          selectedAnswer: true,
-        },
-      },
+  const leaderBoard = await prisma.leaderBoard.findMany({
+    orderBy: {
+      score: 'desc',
     },
   });
-  return { statics, result };
+  const getPosition = leaderBoard.findIndex(position => position.userId === id);
+  const myPosition = getPosition == -1 ? 0 : getPosition + 1;
+  return { statics: { ...statics, myPosition } };
 };
 
 const completeTest = async (id: number, userId: number) => {

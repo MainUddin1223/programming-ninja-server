@@ -18,6 +18,7 @@ export interface ICurrentStatics {
   wrongAnswer: number;
   rightAnswer: number;
   category: string;
+  isCompleted: boolean;
 }
 export interface IStaticsAcc {
   totalScore: number;
@@ -27,6 +28,8 @@ export interface IStaticsAcc {
   email: string;
   category: string[];
   totalTest: number;
+  totalCompletedTest: number;
+  totalPendingTest: number;
 }
 export interface IMyTests {
   score: number;
