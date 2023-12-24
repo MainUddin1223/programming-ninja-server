@@ -88,22 +88,31 @@ const getMyTestById = async (id: number, userId: number) => {
       id,
       userId,
     },
-    // select: {
-    //   id: true,
-    //   category: {
-    //     select: {
-    //       category: true
-    //     }
-    //   },
-
-    // },
     include: {
       category: {
         select: {
           category: true,
         },
       },
-      question: true,
+      question: {
+        orderBy: {
+          id: 'asc',
+        },
+        select: {
+          answered: true,
+          correctAnswer: true,
+          id: true,
+          isCorrectAnswer: true,
+          options: true,
+          questionType: true,
+          selectedAnswer: true,
+          quiz: {
+            select: {
+              question: true,
+            },
+          },
+        },
+      },
     },
   });
   return result;
@@ -145,8 +154,15 @@ const getMyQuizTests = async (id: number) => {
     where: {
       userId: id,
     },
+    include: {
+      category: {
+        select: {
+          category: true,
+        },
+      },
+    },
   });
-  return result;
+  return { result };
 };
 
 const getStatics = async (id: number) => {
@@ -213,6 +229,73 @@ const getStatics = async (id: number) => {
   return { statics, result };
 };
 
+const completeTest = async (id: number, userId: number) => {
+  const isCompleted = await prisma.test.findUnique({
+    where: {
+      id,
+      userId,
+      isCompleted: false,
+    },
+  });
+  if (!isCompleted) {
+    throw new ApiError(404, 'Test not found');
+  }
+  await prisma.$transaction(async prisma => {
+    const updateTest = await prisma.test.update({
+      where: {
+        id,
+      },
+      data: {
+        isCompleted: true,
+      },
+    });
+    const isExist = await prisma.leaderBoard.findFirst({
+      where: {
+        userId,
+      },
+    });
+
+    if (isExist) {
+      await prisma.leaderBoard.update({
+        where: {
+          id: isExist.id,
+        },
+        data: {
+          score: Number(isExist.score) + Number(updateTest.score),
+          testCompleted: Number(isExist.testCompleted) + 1,
+        },
+      });
+    } else {
+      await prisma.leaderBoard.create({
+        data: {
+          userId,
+          score: Number(updateTest.score),
+          testCompleted: 1,
+        },
+      });
+    }
+  });
+  return { message: 'Test completed successfully' };
+};
+
+const getLeaderBoard = async () => {
+  const result = await prisma.leaderBoard.findMany({
+    orderBy: {
+      score: 'desc',
+    },
+    select: {
+      score: true,
+      testCompleted: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  return { data: result };
+};
+
 export const performerService = {
   createQuizTest,
   getMyQuizTests,
@@ -220,4 +303,6 @@ export const performerService = {
   checkAnswer,
   getCategories,
   getMyTestById,
+  completeTest,
+  getLeaderBoard,
 };

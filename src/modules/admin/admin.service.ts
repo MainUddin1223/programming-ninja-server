@@ -14,6 +14,7 @@ const addCategory = async (categoryPayload: ICategory) => {
       },
     },
   });
+
   if (isExist) {
     throw new ApiError(StatusCodes.FORBIDDEN, 'Category already exist');
   }

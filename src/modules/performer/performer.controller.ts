@@ -74,11 +74,36 @@ const getMyTestById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const completeTest = catchAsync(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const userId = Number(req?.user?.id);
+  const result = await performerService.completeTest(id, userId);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Test completed successfully',
+    data: result,
+  });
+});
+
+const getLeaderBoard = catchAsync(async (req: Request, res: Response) => {
+  const result = await performerService.getLeaderBoard();
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Leader board retrieved successfully',
+    data: result,
+  });
+});
+
 export const performerController = {
   createQuizTest,
+  getLeaderBoard,
   getStatics,
   verifyAnswer,
   getCategories,
   getMyTestById,
   getMyTests,
+  completeTest,
 };
