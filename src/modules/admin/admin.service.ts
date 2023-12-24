@@ -39,7 +39,37 @@ const addQuiz = async (data: IAddQuiz) => {
   return result;
 };
 
+const getStatics = async () => {
+  const performers = await prisma.auth.count({
+    where: {
+      role: 'performer',
+    },
+  });
+  const categories = await prisma.category.count({});
+  const totalQuiz = await prisma.quiz.count({});
+  const totalCompletedTest = await prisma.test.count({
+    where: {
+      isCompleted: true,
+    },
+  });
+  const totalPending = await prisma.test.count({
+    where: {
+      isCompleted: false,
+    },
+  });
+  return {
+    result: {
+      performers,
+      categories,
+      totalQuiz,
+      totalCompletedTest,
+      totalPending,
+    },
+  };
+};
+
 export const adminService = {
   addCategory,
   addQuiz,
+  getStatics,
 };

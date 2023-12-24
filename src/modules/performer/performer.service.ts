@@ -204,8 +204,6 @@ const getStatics = async (id: number) => {
       totalScore: 0,
       totalRightAnswer: 0,
       totalWrongAnswer: 0,
-      completedTest: 0,
-      pendingTest: 0,
       name: '',
       email: '',
       category: [],

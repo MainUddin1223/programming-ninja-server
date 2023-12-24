@@ -55,7 +55,18 @@ const addQuiz = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+const getStatics = catchAsync(async (req: Request, res: Response) => {
+  const result = await adminService.getStatics();
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Statics retrieved successfully',
+    data: result,
+  });
+});
+
 export const adminController = {
   addCategory,
   addQuiz,
+  getStatics,
 };
