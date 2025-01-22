@@ -49,6 +49,7 @@ const signUp = async (payload: ISignUpPayload) => {
 
 const login = async (payload: ILoginPayload) => {
   const { email, password } = payload;
+  console.log('--------------------');
   const isUserExist = await prisma.auth.findFirst({
     where: {
       email,
